@@ -1,0 +1,61 @@
+	ORG 25000
+        JP MAIN
+
+MAIN:   
+	call Clear_Screen_Fast
+	LD HL,$4000
+        LD BC,invader
+	
+
+LOOP:         
+      	 ld a,(bc)
+      	 cp 0          ; zero 
+      	 jr z,EXIT     
+      	 LD (HL),A
+     	 inc BC
+     	 inc H		; inc the MSB byte in HL to get a new line
+     	 jr LOOP
+
+EXIT:
+	ret
+     
+invader:
+	DB %00011000
+	DB %00111100
+	DB %01100110
+	DB %11000011
+	DB %01111110
+	DB %00111100
+	DB %01000010
+	DB %10000001
+	DB 0	
+
+; Fast clear-screen routine
+; Uses the stack to block clear memory
+; this block from ::
+; Title:        ZX Spectrum Screen Buffer Routines
+; Author:       Dean Belfield
+Clear_Screen_Fast:      LD (Clear_Screen_Fast_End+1),SP ; Store the stack (self modding code)
+                        LD SP,0x5800                    ; Set stack to end of screen
+                        LD DE,0x0000                    ; We are clearing, so set DE to 0
+                        LD B,0                          ; We loop 256 times - 12 words * 256 = 6144 bytes
+Clear_Screen_Fast_Loop: DS 12,0xD5                      ; 0xD5 is the code for PUSH DE - this is 12 PUSH DE's                   
+                        DJNZ Clear_Screen_Fast_Loop
+Clear_Screen_Fast_End:  LD SP,0x0000                    ; Restore the stack
+                        RET
+
+
+
+
+
+;16bitLoop:
+;    LD a,85
+;    LD (HL),A
+;    inc HL
+;    dec de
+;    ld a,d
+;    or e
+;    jp nz,16bitLoop
+
+
+   
